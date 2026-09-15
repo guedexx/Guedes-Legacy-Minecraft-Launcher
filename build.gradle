@@ -1,0 +1,84 @@
+plugins {
+    id 'java'
+}
+
+group = 'net.minecraft'
+version = '1.6.94-dev'
+
+repositories {
+    mavenCentral()
+    maven { url = 'https://jitpack.io' }
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+sourceSets {
+    launcher {
+        java.srcDirs = ['launcher-src']
+        resources.srcDirs = ['launcher-src']
+    }
+
+    bootstrap {
+        java.srcDirs = ['bootstrap-src']
+        resources.srcDirs = ['bootstrap-src']
+    }
+}
+
+dependencies {
+    launcherImplementation 'com.google.guava:guava:17.0'
+    launcherImplementation 'com.google.code.gson:gson:2.12.1'
+
+    launcherImplementation 'commons-io:commons-io:2.18.0'
+    launcherImplementation 'org.apache.commons:commons-lang3:3.17.0'
+    launcherImplementation 'org.apache.commons:commons-compress:1.27.1'
+
+    launcherImplementation 'org.apache.logging.log4j:log4j-api:2.0-rc1'
+    launcherImplementation 'org.apache.logging.log4j:log4j-core:2.0-rc1'
+
+    launcherImplementation 'net.sf.jopt-simple:jopt-simple:5.0.4'
+
+    // Microsoft authentication used by this fork
+    launcherImplementation 'com.github.Litarvan:OpenAuth:1.1.6'
+
+    launcherImplementation 'org.openjfx:javafx-base:21.0.8:win'
+    launcherImplementation 'org.openjfx:javafx-graphics:21.0.8:win'
+    launcherImplementation 'org.openjfx:javafx-controls:21.0.8:win'
+    launcherImplementation 'org.openjfx:javafx-swing:21.0.8:win'
+    launcherImplementation 'org.openjfx:javafx-web:21.0.8:win'
+    launcherImplementation 'org.openjfx:javafx-media:21.0.8:win'
+
+    launcherImplementation 'net.java.dev.jna:jna-platform:5.19.1'
+
+    launcherImplementation 'com.twelvemonkeys.imageio:imageio-webp:3.15.0'
+}
+
+tasks.register('launcherJar', Jar) {
+    archiveBaseName = 'MinecraftLauncher'
+    archiveVersion = '1.6.94'
+
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+
+    from sourceSets.launcher.output
+
+    from {
+        configurations.launcherRuntimeClasspath.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    manifest {
+        attributes(
+                'Implementation-Version': '1.6.94',
+                'Implementation-Title': 'Minecraft Launcher',
+                'Main-Class': 'net.minecraft.launcher.Main'
+        )
+    }
+
+    exclude 'META-INF/*.SF'
+    exclude 'META-INF/*.DSA'
+    exclude 'META-INF/*.RSA'
+}
